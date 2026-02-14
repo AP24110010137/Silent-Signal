@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Silent Signal - Advanced</title>
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  text-align:center;
+  overflow-x:hidden;
+  background: linear-gradient(135deg,#fbc2eb,#a6c1ee);
+}
+
+/* Hide Sections */
+.page{ display:none; }
+.active{ display:block; }
+
+/* BEAUTIFUL LOGIN */
+.login-container{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+}
+.login-card{
+  background:white;
+  padding:45px;
+  width:350px;
+  border-radius:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.3);
+  animation: fadeIn 1s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0; transform:scale(0.9);}
+  to{opacity:1; transform:scale(1);}
+}
+input{
+  width:90%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+button{
+  padding:10px 15px;
+  margin:6px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* NAV */
+nav{
+  background:#333;
+  padding:15px;
+}
+nav button{
+  background:none;
+  color:white;
+  margin:5px;
+}
+
+/* MEMORY */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, 80px);
+  gap:10px;
+  justify-content:center;
+  margin-top:30px;
+}
+.card{
+  width:80px;
+  height:80px;
+  background:#333;
+  color:white;
+  font-size:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* WALL */
+.wall{
+  background:white;
+  width:70%;
+  margin:20px auto;
+  padding:15px;
+  border-radius:10px;
+  text-align:left;
+}
+
+/* TIMEPASS */
+.box{
+  background:white;
+  width:70%;
+  margin:30px auto;
+  padding:20px;
+  border-radius:10px;
+}
+
+/* FLOATING EMOJIS */
+.floating{
+  position:fixed;
+  font-size:24px;
+  animation: floatUp 6s linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh);opacity:1;}
+  100%{transform:translateY(-10vh);opacity:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page active login-container">
+  <div class="login-card">
+    <h2>Silent Signal</h2>
+    <p style="color:#777;">Your emotions matter 💛</p>
+    <input type="text" id="user" placeholder="Enter your name">
+    <button onclick="login()" style="background:#ff4e50;color:white;width:95%;">Login</button>
+    <p id="loginMsg" style="color:red;"></p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appPage" class="page">
+
+<nav>
+<button onclick="showPage('dashboard')">Home</button>
+<button onclick="showPage('memory')">Memory Game</button>
+<button onclick="showPage('fun')">Timepass</button>
+<button onclick="logout()">Logout</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section">
+<h2>Welcome 👋 Your feelings matter 💛</h2>
+<h3>Select Your Mood or Type Your Feeling</h3>
+<button onclick="setMood('happy')">😊 Happy</button>
+<button onclick="setMood('sad')">😢 Sad</button>
+<button onclick="setMood('angry')">😡 Angry</button>
+<button onclick="setMood('excited')">🤩 Excited</button>
+
+<br><br>
+<input type="text" id="customMood" placeholder="Type your feeling here">
+<button onclick="customFeeling()">Submit Feeling</button>
+
+<div class="wall">
+<h3>💛 Gratitude Wall</h3>
+<div id="wall"></div>
+</div>
+</div>
+
+<!-- MEMORY GAME -->
+<div id="memory" class="section" style="display:none;">
+<h2>🧠 Memory Game</h2>
+<h3>Score: <span id="score">0</span></h3>
+<div class="grid" id="board"></div>
+<h3 id="status"></h3>
+<button onclick="restartGame()">Restart</button>
+</div>
+
+<!-- TIMEPASS -->
+<div id="fun" class="section" style="display:none;">
+<h2>💖 Fun Corner</h2>
+<div class="box">
+<button onclick="showTruth()">😜 Truth</button>
+<button onclick="showRiddle()">🧩 Riddle</button>
+<button onclick="showQuiz()">💕 Quiz</button>
+
+<p id="question" style="margin-top:15px;font-weight:bold;"></p>
+
+<input type="text" id="answer" placeholder="Write your answer...">
+<button onclick="submitAnswer()">Submit</button>
+<p id="response"></p>
+</div>
+</div>
+
+</div>
+
+<script>
+
+/* LOGIN */
+function login(){
+  let username = document.getElementById("user").value.trim();
+  if(username===""){
+    loginMsg.innerText="Please enter your name!";
+    return;
+  }
+  loginPage.style.display="none";
+  appPage.style.display="block";
+  document.querySelector("#dashboard h2").innerText = "Welcome 👋 " + username;
+}
+
+/* LOGOUT */
+function logout(){ location.reload(); }
+
+function showPage(page){
+  dashboard.style.display="none";
+  memory.style.display="none";
+  fun.style.display="none";
+  document.getElementById(page).style.display="block";
+}
+
+/* FLOATING */
+let floats=["✨","💛","🌈","⭐","😊"];
+function createFloating(){
+  let e=document.createElement("div");
+  e.className="floating";
+  e.innerText=floats[Math.floor(Math.random()*floats.length)];
+  e.style.left=Math.random()*100+"vw";
+  e.style.animationDuration=(3+Math.random()*3)+"s";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),6000);
+}
+setInterval(createFloating,900);
+
+/* MOOD */
+function setMood(mood){
+  let reason=prompt("Why are you feeling "+mood+"?");
+  let gratitude=prompt("Write something you are grateful for today 💛");
+  let p=document.createElement("p");
+  p.innerText=`😊 Feeling: ${mood} | Reason: ${reason} | Grateful for: ${gratitude}`;
+  wall.appendChild(p);
+}
+
+/* CUSTOM FEELING */
+function customFeeling(){
+  let feeling = document.getElementById("customMood").value.trim();
+  if(feeling===""){ alert("Please type a feeling!"); return; }
+  let reason = prompt("Why are you feeling "+feeling+"?");
+  let gratitude = prompt("Write something you are grateful for today 💛");
+  let p=document.createElement("p");
+  p.innerText=`😊 Feeling: ${feeling} | Reason: ${reason} | Grateful for: ${gratitude}`;
+  wall.appendChild(p);
+  document.getElementById("customMood").value="";
+}
+
+/* MEMORY GAME WITH SCORE */
+let emojis=["😊","😊","😢","😢","😡","😡","🤩","🤩","😍","😍","😎","😎","🥰","🥰","🤗","🤗"];
+let first=null, lock=false, matched=0, score=0;
+
+function startGame(){
+  board.innerHTML="";
+  status.innerText="";
+  matched=0;
+  score=0;
+  scoreDisplay();
+  emojis.sort(()=>0.5-Math.random());
+
+  emojis.forEach(symbol=>{
+    let card=document.createElement("div");
+    card.className="card";
+    card.dataset.symbol=symbol;
+    card.innerText="❓";
+    card.onclick=flip;
+    board.appendChild(card);
+  });
+}
+
+function flip(){
+  if(lock||this.innerText!=="❓")return;
+  this.innerText=this.dataset.symbol;
+  if(!first){ first=this; }
+  else{
+    if(first.dataset.symbol===this.dataset.symbol){
+      matched+=2;
+      score+=10;
+      scoreDisplay();
+      first=null;
+      if(matched===16){
+        status.innerText="🎉 You Won! Final Score: "+score;
+      }
+    }else{
+      score-=2;
+      if(score<0) score=0;
+      scoreDisplay();
+      lock=true;
+      setTimeout(()=>{
+        first.innerText="❓";
+        this.innerText="❓";
+        first=null;
+        lock=false;
+      },800);
+    }
+  }
+}
+
+function scoreDisplay(){ document.getElementById("score").innerText=score; }
+function restartGame(){ startGame(); }
+startGame();
+
+/* TIMEPASS */
+let truths=["What is your biggest secret crush?","Have you ever lied to your best friend?"];
+let riddles=[
+{q:"I have keys but no locks. What am I?", a:"keyboard"},
+{q:"What has hands but cannot clap?", a:"clock"}
+];
+let quizzes=[
+{q:"Capital of India?", a:"delhi"},
+{q:"2 + 2 = ?", a:"4"}
+];
+
+let currentAnswer="", currentType="";
+
+function random(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function showTruth(){ currentType="truth"; question.innerText=random(truths); response.innerText=""; }
+function showRiddle(){ currentType="riddle"; let obj=random(riddles); question.innerText=obj.q; currentAnswer=obj.a; response.innerText=""; }
+function showQuiz(){ currentType="quiz"; let obj=random(quizzes); question.innerText=obj.q; currentAnswer=obj.a; response.innerText=""; }
+
+function submitAnswer(){
+  let userAns=answer.value.trim().toLowerCase();
+  if(userAns===""){ response.innerText="Please write something 😊"; return; }
+
+  if(currentType==="truth"){
+    response.innerText="💖 Honest answer! You're amazing!";
+  }
+  else{
+    if(userAns===currentAnswer){
+      response.innerText="🎉 Correct! Brilliant answer 👏✨";
+    }else{
+      response.innerText="❌ Wrong! Correct answer is: "+currentAnswer+" 💛 Keep learning!";
+    }
+  }
+  answer.value="";
+}
+
+</script>
+
+</body>
+</html>
